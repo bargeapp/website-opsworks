@@ -1,3 +1,3 @@
 source 'https://api.berkshelf.com'
 
-cookbook 'logentries', git: 'git@github.com:bargeapp/logentries_opsworks.git'
+cookbook 'logentries', github: 'bargeapp/logentries_opsworks'
