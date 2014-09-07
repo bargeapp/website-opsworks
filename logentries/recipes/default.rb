@@ -1,28 +1,19 @@
-cookbook_file '/etc/ssl/certs/logentries.all.crt' do
-  source 'logentries.all.crt'
+cookbook_file '/etc/yum.repos.d/logentries.repo' do
+  source 'logentries.repo'
   owner 'root'
   group 'root'
   mode 0644
 end
 
-node[:deploy].each do |application, deploy|
-  template "/etc/rsyslog.d/#{application}_logentries.conf" do
-    source 'logentries.conf.erb'
-    owner 'root'
-    group 'root'
-    mode 0755
-    variables(
-      :token => deploy[:logentries][:token]
-    )
-  end
+execute "yum update"
+execute "yum install logentries"
+execute "le register --user-key #{node[:logentries][:userkey]} --name='#{node[:logentries][:hostname]}'"
+execute "yum install logentries-daemon"
+
+logs = node[:le][:logs_to_follow]
+logs.each do |log|
+  execute "le follow '#{log}'"
 end
 
-bash 'install-rsyslog-gnutls' do
-  user 'root'
-  code 'yum -y install rsyslog-gnutls'
-end
-
-bash 'rsyslog-restart' do
-  user 'root'
-  code 'service rsyslog restart'
-end
+# Start the service
+execute "service logentries restart"
