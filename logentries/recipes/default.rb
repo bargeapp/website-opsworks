@@ -10,7 +10,7 @@ execute "yum install logentries"
 execute "le register --user-key #{node[:logentries][:userkey]} --name='#{node[:logentries][:hostname]}'"
 execute "yum install logentries-daemon"
 
-logs = node[:le][:logs_to_follow]
+logs = node[:logentries][:files]
 logs.each do |log|
   execute "le follow '#{log}'"
 end
